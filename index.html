@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM Copilot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    body {
+      font-family: 'Inter', sans-serif; /* A common, clean sans-serif font */
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* Editor Specific Styles */
+    .rich-editor-content {
+      outline: none;
+      min-height: 200px;
+    }
+    .rich-editor-content h1 {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      color: #f1f5f9;
+    }
+    .rich-editor-content h2 {
+      font-size: 1.25em;
+      font-weight: 600;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      color: #e2e8f0;
+    }
+    .rich-editor-content ul {
+      list-style-type: disc;
+      padding-left: 1.5em;
+      margin-bottom: 1em;
+    }
+    .rich-editor-content ol {
+      list-style-type: decimal;
+      padding-left: 1.5em;
+      margin-bottom: 1em;
+    }
+    .rich-editor-content p {
+      margin-bottom: 1em;
+      line-height: 1.6;
+    }
+    .rich-editor-content strong {
+      color: #f8fafc;
+      font-weight: 700;
+    }
+    .rich-editor-content li {
+      margin-bottom: 0.25em;
+    }
+    /* Empty paragraph fix for contentEditable */
+    .rich-editor-content p:empty:before {
+      content: "\00a0";
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react": "https://esm.sh/react@18.3.1",
+    "@google/genai": "https://esm.sh/@google/genai",
+    "marked": "https://esm.sh/marked@12.0.0",
+    "chart.js": "https://esm.sh/chart.js@4.4.3",
+    "react-chartjs-2": "https://esm.sh/react-chartjs-2@5.2.0?deps=react@18.3.1,chart.js@4.4.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-900 text-slate-100">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
