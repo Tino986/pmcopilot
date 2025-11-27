@@ -1,17 +1,46 @@
 
-
 // FIX: Removed InlineDataPart and TextPart as they are not exported from @google/genai
 import { GoogleGenAI, GenerateContentResponse, GroundingChunk } from "@google/genai";
 
 // Safely get the API key to prevent crashing in environments where 'process' is not defined.
 const getApiKey = (): string | undefined => {
+  // 1. Try standard process.env (Node.js / Webpack / Polyfilled environments)
   try {
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
     }
   } catch (e) {
-    console.error("Could not access process.env.API_KEY", e);
+    // process is not defined
   }
+
+  // 2. Try import.meta.env (Vite / Modern ES Modules)
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      if (import.meta.env.VITE_API_KEY) {
+        // @ts-ignore
+        return import.meta.env.VITE_API_KEY;
+      }
+      // @ts-ignore
+      if (import.meta.env.API_KEY) {
+        // @ts-ignore
+        return import.meta.env.API_KEY;
+      }
+    }
+  } catch (e) {
+    // import.meta is not defined
+  }
+
+  // 3. Try global window object (Manual injection script in index.html)
+  try {
+    if (typeof window !== 'undefined' && (window as any).API_KEY) {
+      return (window as any).API_KEY;
+    }
+  } catch (e) {
+    // window is not defined
+  }
+
   return undefined;
 };
 
@@ -37,7 +66,7 @@ interface GeminiServiceResponse {
 export const callGeminiAPI = async (prompt: string, useGoogleSearch: boolean = false): Promise<GeminiServiceResponse> => {
   // Check if the AI client was initialized before using it.
   if (!ai) {
-    return { text: "Error: API_KEY no está configurada. La funcionalidad está limitada." };
+    return { text: "Error: API_KEY no está configurada. Si estás en un servidor externo, asegúrate de configurar la variable de entorno 'VITE_API_KEY' o 'API_KEY' en tu proceso de build." };
   }
 
   try {
