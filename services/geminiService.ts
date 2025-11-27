@@ -6,8 +6,9 @@ import { GoogleGenAI, GenerateContentResponse, GroundingChunk } from "@google/ge
 const getApiKey = (): string | undefined => {
   // 1. Try standard process.env (Node.js / Webpack / Polyfilled environments)
   try {
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return process.env.API_KEY;
+    if (typeof process !== 'undefined' && process.env) {
+      if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+      if (process.env.API_KEY) return process.env.API_KEY;
     }
   } catch (e) {
     // process is not defined
@@ -18,9 +19,19 @@ const getApiKey = (): string | undefined => {
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env) {
       // @ts-ignore
+      if (import.meta.env.VITE_GEMINI_API_KEY) {
+        // @ts-ignore
+        return import.meta.env.VITE_GEMINI_API_KEY;
+      }
+      // @ts-ignore
       if (import.meta.env.VITE_API_KEY) {
         // @ts-ignore
         return import.meta.env.VITE_API_KEY;
+      }
+      // @ts-ignore
+      if (import.meta.env.GEMINI_API_KEY) {
+        // @ts-ignore
+        return import.meta.env.GEMINI_API_KEY;
       }
       // @ts-ignore
       if (import.meta.env.API_KEY) {
@@ -34,8 +45,9 @@ const getApiKey = (): string | undefined => {
 
   // 3. Try global window object (Manual injection script in index.html)
   try {
-    if (typeof window !== 'undefined' && (window as any).API_KEY) {
-      return (window as any).API_KEY;
+    if (typeof window !== 'undefined') {
+      if ((window as any).GEMINI_API_KEY) return (window as any).GEMINI_API_KEY;
+      if ((window as any).API_KEY) return (window as any).API_KEY;
     }
   } catch (e) {
     // window is not defined
@@ -53,7 +65,7 @@ let ai: GoogleGenAI | null = null;
 if (API_KEY) {
   ai = new GoogleGenAI({ apiKey: API_KEY });
 } else {
-  console.error("API_KEY is not set. Please set the API_KEY environment variable. App functionality will be limited.");
+  console.error("API_KEY is not set. Please set VITE_GEMINI_API_KEY, GEMINI_API_KEY, or API_KEY environment variable.");
 }
 
 const MODEL_NAME = 'gemini-2.5-flash';
@@ -66,7 +78,7 @@ interface GeminiServiceResponse {
 export const callGeminiAPI = async (prompt: string, useGoogleSearch: boolean = false): Promise<GeminiServiceResponse> => {
   // Check if the AI client was initialized before using it.
   if (!ai) {
-    return { text: "Error: API_KEY no está configurada. Si estás en un servidor externo, asegúrate de configurar la variable de entorno 'VITE_API_KEY' o 'API_KEY' en tu proceso de build." };
+    return { text: "Error: API_KEY no está configurada. En Vercel, configura la variable de entorno 'VITE_GEMINI_API_KEY' (recomendado) o 'GEMINI_API_KEY'." };
   }
 
   try {
