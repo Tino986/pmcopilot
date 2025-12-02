@@ -387,7 +387,10 @@ Esto significa que tú podrás **[Beneficio Final]**."
       { id: 'featureList', label: 'Lista de Funcionalidades (una por línea)', placeholder: 'Ej: Chat en tiempo real\nAsignación de tareas\nDiagramas de Gantt\nIntegración con Slack', type: 'textarea', rows: 4 },
     ],
     promptGenerator: (inputs) => featurePromptEnhancer(
-      `Clasifica las funcionalidades usando el Modelo Kano para: "${inputs.productDescription}".
+      `Clasifica las siguientes funcionalidades usando el Modelo Kano para el producto: "${inputs.productDescription}".
+      
+**Funcionalidades a clasificar:**
+${inputs.featureList}
 
 # Clasificación Kano
 
@@ -419,7 +422,8 @@ Esto significa que tú podrás **[Beneficio Final]**."
       { id: 'featureList', label: 'Lista de Funcionalidades', placeholder: 'Ej: Funcionalidad A\nFuncionalidad B', type: 'textarea', rows: 5 },
     ],
     promptGenerator: (inputs) => featurePromptEnhancer(
-      `Realiza una estimación RICE (Reach, Impact, Confidence, Effort) para estas funcionalidades.
+      `Realiza una estimación RICE (Reach, Impact, Confidence, Effort) para las siguientes funcionalidades:
+"${inputs.featureList}"
 
 # Priorización RICE
 
