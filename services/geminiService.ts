@@ -143,9 +143,26 @@ export const callGeminiJsonAPI = async (prompt: string): Promise<Record<string, 
             },
         });
 
-        const text = response.text;
+        let text = response.text;
         if (!text) return null;
-        return JSON.parse(text);
+
+        // Cleanup: Remove any Markdown code blocks if the model included them despite mimeType
+        text = text.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/\s*```$/, '');
+
+        try {
+            return JSON.parse(text);
+        } catch (parseError) {
+            console.warn("JSON parse failed, attempting to fix control characters...", parseError);
+            // Heuristic fix: "Bad control character" usually means literal newlines inside strings.
+            // We use a regex to identify double-quoted strings and escape newlines inside them.
+            // Regex explanation: Matches a double-quoted string, accounting for escaped quotes within it.
+            const fixedText = text.replace(/"((?:[^"\\]|\\.)*)"/g, (match) => {
+                // Replace literal newlines with escaped newlines inside the string
+                return match.replace(/\n/g, "\\n").replace(/\r/g, "");
+            });
+            
+            return JSON.parse(fixedText);
+        }
     } catch (error) {
         console.error("Error generating JSON example:", error);
         return null;
