@@ -237,7 +237,9 @@ export const FeaturePane: React.FC<FeaturePaneProps> = ({ featureConfig, globalC
       Instrucciones:
       1. Genera contenido realista y profesional que encaje con el Contexto del Producto (si existe) o el producto inventado.
       2. El JSON debe tener como claves EXACTAMENTE los IDs de los campos listados arriba.
-      3. No incluyas markdown, solo el JSON crudo.
+      3. IMPORTANTE: Los valores de los campos deben ser cadenas de texto (Strings).
+      4. Si un campo requiere una lista (ej: listas de funcionalidades, tickets, competidores), el valor debe ser UN SOLO STRING con los elementos separados por "\\n" (escapado). Asegúrate de que el JSON no contenga caracteres de control reales (saltos de línea sin escapar) dentro de los valores. NO devuelvas Arrays ([]) ni Objetos ({}) anidados.
+      5. No incluyas markdown, solo el JSON crudo.
       `;
 
       // Call AI to get JSON
@@ -248,8 +250,25 @@ export const FeaturePane: React.FC<FeaturePaneProps> = ({ featureConfig, globalC
         // We only take values that match our field IDs to be safe
         const newValues: Record<string, string> = {};
         fieldIds.forEach(id => {
-          if (dynamicData[id]) {
-            newValues[id] = typeof dynamicData[id] === 'string' ? dynamicData[id] : JSON.stringify(dynamicData[id]);
+          if (dynamicData[id] !== undefined) {
+             let value = dynamicData[id];
+
+             // Robust handling for unexpected types (Arrays or Objects)
+             if (Array.isArray(value)) {
+                 // Convert Array to multiline string
+                 value = value.map((item: any) => {
+                     if (typeof item === 'object' && item !== null) {
+                         // Flatten object to string retaining keys for context
+                         return Object.entries(item).map(([k, v]) => `${k}: ${v}`).join(', ');
+                     }
+                     return String(item);
+                 }).join('\n');
+             } else if (typeof value === 'object' && value !== null) {
+                 // Convert Object to string if it slipped through
+                 value = JSON.stringify(value); 
+             }
+
+            newValues[id] = String(value);
           } else if (featureConfig.exampleInputs && featureConfig.exampleInputs[id]) {
              // Partial fallback if AI missed a field
              newValues[id] = featureConfig.exampleInputs[id];
